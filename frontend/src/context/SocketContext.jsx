@@ -23,13 +23,14 @@ export const SocketContextProvider = ({ children }) => {
 	//const { setPosts } = usePost();
 	const [gameRequests, setGameRequests] = useState([]);
 	const navigate = useNavigate();
+	import dotenv from "dotenv";
 	const {setFollowersDetails}=useState([]);
 	useEffect(() => {
 		if (authUser) {
-			const socket = io("https://uday-github.onrender.com", {
-				query: {
-					userId: authUser._id,
-				},
+			const socket = io(process.env.BACKEND_URL, {
+				query: { userId: authUser._id },
+				transports: ["websocket", "polling"],
+				reconnection: true
 			});
 
 			setSocket(socket);
