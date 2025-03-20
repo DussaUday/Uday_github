@@ -13,59 +13,6 @@ export const getUsersForSidebar = async (req, res) => {
 	}
 };
 // controllers/user.controller.js
-export const blockUser = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const currentUserId = req.user._id;
-
-        if (userId === currentUserId.toString()) {
-            return res.status(400).json({ error: "Cannot block yourself" });
-        }
-
-        const currentUser = await User.findById(currentUserId);
-        if (!currentUser) {
-            return res.status(404).json({ error: "Current user not found" });
-        }
-
-        const userToBlock = await User.findById(userId);
-        if (!userToBlock) {
-            return res.status(404).json({ error: "User to block not found" });
-        }
-
-        const isBlocked = currentUser.blockedUsers.includes(userId);
-        if (isBlocked) {
-            currentUser.blockedUsers = currentUser.blockedUsers.filter(id => id.toString() !== userId);
-            await currentUser.save();
-            io.emit("userUnblocked", { unblockedUserId: userId });
-            return res.status(200).json({ message: "User unblocked successfully", blocked: false });
-        } else {
-            currentUser.blockedUsers.push(userId);
-            await currentUser.save();
-            io.emit("userBlocked", { blockedUserId: userId });
-            return res.status(200).json({ message: "User blocked successfully", blocked: true });
-        }
-    } catch (error) {
-        console.error("Error blocking/unblocking user:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-};
-export const isUserBlocked = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const currentUserId = req.user._id;
-
-        const currentUser = await User.findById(currentUserId);
-        if (!currentUser) {
-            return res.status(404).json({ error: "Current user not found" });
-        }
-
-        const isBlocked = currentUser.blockedUsers.includes(userId);
-        res.status(200).json({ blocked: isBlocked });
-    } catch (error) {
-        console.error("Error checking if user is blocked:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-};
 // controllers/user.controller.js
 export const followUser = async (req, res) => {
     try {

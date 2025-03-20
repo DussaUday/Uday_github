@@ -5,7 +5,7 @@ import { useAuthContext } from "./AuthContext";
 import useConversation from "../zustand/useConversation";
 import io from "socket.io-client";
 import PropTypes from "prop-types";
-
+import dotenv from "dotenv";
 //import usePost from "../hooks/usePost";
 
 
@@ -21,10 +21,11 @@ export const SocketContextProvider = ({ children }) => {
 	const { authUser } = useAuthContext();
 	const { updateMessage, setMessages, messages, incrementUnreadMessages,unreadMessages } = useConversation();
 	//const { setPosts } = usePost();
+	const [followersDetails, setFollowersDetails] = useState([]);
 	const [gameRequests, setGameRequests] = useState([]);
 	const navigate = useNavigate();
-	import dotenv from "dotenv";
-	const {setFollowersDetails}=useState([]);
+	
+	
 	useEffect(() => {
 		if (authUser) {
 			const socket = io(process.env.BACKEND_URL, {
@@ -79,11 +80,13 @@ export const SocketContextProvider = ({ children }) => {
 			});
 			// In your socket context or component
 			socket.on("userUnfollowed", ({ unfollowerId, unfollowedUserId }) => {
-    			if (unfollowedUserId === authUser._id) {
-        			// Update the followers list if the current user was unfollowed
-        			setFollowersDetails(prevFollowersDetails => 
-            	prevFollowersDetails.filter(user => user._id !== unfollowerId)
-        	);
+				if (unfollowedUserId === authUser._id) {
+					// Ensure followersDetails is initialized
+					setFollowersDetails(prevFollowersDetails => 
+						prevFollowersDetails ? prevFollowersDetails.filter(user => user._id !== unfollowerId) : []
+					);
+				}
+			});
 			socket.on("newGameRequest", (data) => {
                 setGameRequests((prev) => [...prev, data]);
             });
