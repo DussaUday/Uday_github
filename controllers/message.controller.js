@@ -175,11 +175,15 @@ export const getUsersForSidebar = async (req, res) => {
             return res.status(404).json({ error: "Current user not found" });
         }
 
+        // Ensure followers and following are arrays
+        const followers = Array.isArray(currentUser.followers) ? currentUser.followers : [];
+        const following = Array.isArray(currentUser.following) ? currentUser.following : [];
+
         // Find users who are either followers or being followed by the current user
         const usersForSidebar = await User.find({
             _id: { $ne: loggedInUserId }, // Exclude the current user
             $or: [
-                { _id: { $in: currentUser.followers } }, // Users who are followers
+                { _id: { $in: followers } }, // Users who are followers
                 { followers: { $in: [loggedInUserId] } }, // Users who are being followed by the current user
             ],
         }).select("-password"); // Exclude password field
