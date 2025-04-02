@@ -5,7 +5,11 @@ import useConversation from "../zustand/useConversation";
 const useGetConversations = () => {
     const [loading, setLoading] = useState(false);
     const [conversations, setConversations] = useState([]);
-    const { pinnedConversations, mutedConversations, archivedConversations } = useConversation();
+    const { 
+        pinnedConversations = [], 
+        mutedConversations = [], 
+        archivedConversations = [] 
+    } = useConversation();
 
     useEffect(() => {
         const getConversations = async () => {
@@ -22,12 +26,12 @@ const useGetConversations = () => {
                     new Date(b.lastMessageTimestamp) - new Date(a.lastMessageTimestamp)
                 );
 
-                // Apply pinned, muted, and archived logic
+                // Apply pinned, muted, and archived logic with null checks
                 const processedConversations = sortedConversations.map((conversation) => ({
                     ...conversation,
-                    isPinned: pinnedConversations.includes(conversation._id),
-                    isMuted: mutedConversations.includes(conversation._id),
-                    isArchived: archivedConversations.includes(conversation._id),
+                    isPinned: pinnedConversations?.includes(conversation._id) || false,
+                    isMuted: mutedConversations?.includes(conversation._id) || false,
+                    isArchived: archivedConversations?.includes(conversation._id) || false,
                 }));
 
                 setConversations(processedConversations);
