@@ -4,12 +4,15 @@ import { persist } from "zustand/middleware";
 const useConversation = create(
     persist(
         (set, get) => ({
-            // State
+            // State with default values
             messages: [],
             selectedConversation: null,
             unreadMessages: {},
+            pinnedConversations: [],
+            mutedConversations: [],
+            archivedConversations: [],
 
-            
+            // Actions
             setMessages: (newMessages) => set({ messages: newMessages }),
             setSelectedConversation: (selectedConversation) => set({ selectedConversation }),
             updateMessage: (messageId, updates) =>
@@ -18,22 +21,22 @@ const useConversation = create(
                         msg._id === messageId ? { ...msg, ...updates } : msg
                     ),
                 })),
-                incrementUnreadMessages: (conversationId) =>
-                    set((state) => {
-                        const updatedUnreadMessages = {
-                            ...state.unreadMessages,
-                            [conversationId]: (state.unreadMessages[conversationId] || 0) + 1,
-                        };
-                        return { unreadMessages: updatedUnreadMessages };
-                    }),
-                    resetUnreadMessages: (conversationId) =>
-                        set((state) => {
-                            const updatedUnreadMessages = {
-                                ...state.unreadMessages,
-                                [conversationId]: 0,
-                            };
-                            return { unreadMessages: updatedUnreadMessages };
-                        }),
+            incrementUnreadMessages: (conversationId) =>
+                set((state) => {
+                    const updatedUnreadMessages = {
+                        ...state.unreadMessages,
+                        [conversationId]: (state.unreadMessages[conversationId] || 0) + 1,
+                    };
+                    return { unreadMessages: updatedUnreadMessages };
+                }),
+            resetUnreadMessages: (conversationId) =>
+                set((state) => {
+                    const updatedUnreadMessages = {
+                        ...state.unreadMessages,
+                        [conversationId]: 0,
+                    };
+                    return { unreadMessages: updatedUnreadMessages };
+                }),
             addMessage: (newMessage) =>
                 set((state) => ({
                     messages: [...state.messages, newMessage],
@@ -50,8 +53,8 @@ const useConversation = create(
                 })),
         }),
         {
-            name: "conversation-storage", // Unique name for localStorage
-            getStorage: () => localStorage, // Use localStorage for persistence
+            name: "conversation-storage",
+            getStorage: () => localStorage,
         }
     )
 );
