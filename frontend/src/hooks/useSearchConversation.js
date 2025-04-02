@@ -3,14 +3,13 @@ import useGetConversations from "../pages/home/useGetConversations";
 
 const useSearchConversation = (search) => {
     const [suggestions, setSuggestions] = useState([]);
-    const { conversations, loading, error } = useGetConversations();
+    const { conversations = [], loading, error } = useGetConversations();
 
     useEffect(() => {
-        if (search && Array.isArray(conversations)) { // Ensure conversations is an array
-            const filteredSuggestions = conversations.filter((conversation) =>
-                conversation.fullName.toLowerCase().includes(search.toLowerCase())
+        if (search && Array.isArray(conversations)) {
+            const filteredSuggestions = conversations.filter((conversation) => 
+                conversation?.fullName?.toLowerCase()?.includes(search?.toLowerCase() || "")
             );
-            console.log("Filtered Suggestions:", filteredSuggestions); // Debugging
             setSuggestions(filteredSuggestions);
         } else {
             setSuggestions([]);
